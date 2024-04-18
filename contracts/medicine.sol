@@ -95,5 +95,20 @@ contract MedicineManager {
         }
     }
 
+    function getMedicinesBySupplierId(string memory _supplierId) public view returns (uint256[] memory) {
+        uint256[] memory matchingMedicineIds = new uint256[](medicines.length);
+        uint256 count = 0;
+        for (uint256 i = 0; i < medicines.length; i++) {
+            if (medicines[i].suppliers.length > 0 && keccak256(abi.encodePacked(medicines[i].suppliers[medicines[i].suppliers.length - 1])) == keccak256(abi.encodePacked(_supplierId))) {
+                matchingMedicineIds[count++] = medicines[i].id;
+            }
+        }
+        // Resize the array to remove any empty slots
+        assembly {
+            mstore(matchingMedicineIds, count)
+        }
+        return matchingMedicineIds;
+    }
+
     event MedicineAdded(uint256 indexed index);
 }

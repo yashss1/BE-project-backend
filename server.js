@@ -6,6 +6,11 @@ const axios = require('axios');
 const { Readable } = require('stream');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const mongoose = require("mongoose");
+const connectDatabase = require("./database/connection");
+const userRouter = require("./routers/userRouter");
+
+connectDatabase();
 
 
 // var provider = ethers.getDefaultProvider('');
@@ -24,8 +29,10 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use("/user", userRouter);
 
 const { int, string } = require('hardhat/internal/core/params/argumentTypes');
+
 
 require('dotenv').config();
  
@@ -209,6 +216,23 @@ app.post('/addMedicine', async function (req, res, next) {
       res.status(500).send({"error":"Invalid Input Passed"});
     }
   });
+
+  app.get('/getSupplierMedicines/:supplierId', async function (req, res, next) {
+    try {
+      const supplierId = req.params.supplierId;
+      console.log(supplierId);
+      // Calling the getMedicine function of the contract
+      const medicines = await contract.getMedicinesBySupplierId(supplierId);
+
+      const parsedmedicineIds = medicines.map(temp => parseInt(temp.toString()));
+
+      console.log("Medicines : ", parsedmedicineIds);
+      res.status(200).send({ medicines: parsedmedicineIds });
+    } catch (err) {
+      console.error('Error fetching medicine:', err);
+      res.status(500).send({"error":"Invalid Input Passed"});
+    }
+  });
   
   
   app.get('/create-qr', async function (req, res, next) {
@@ -225,3 +249,4 @@ app.post('/addMedicine', async function (req, res, next) {
       res.status(500).send('Internal Server Error');
     }
   });
+
