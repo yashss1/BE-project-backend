@@ -1,7 +1,10 @@
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var ethers = require('ethers');
+// var ethers = require('ethers');
+const { ethers, JsonRpcProvider } = require('ethers');
+
+
 const axios = require('axios');
 const { Readable } = require('stream');
 const cors = require('cors');
@@ -37,9 +40,10 @@ const { int, string } = require('hardhat/internal/core/params/argumentTypes');
 require('dotenv').config();
  
 let abi = require('./artifacts/contracts/medicine.sol/MedicineManager.json').abi;
-const provider = new ethers.getDefaultProvider(
-  process.env.PROVIDER_URL
-);
+// const provider = new ethers.getDefaultProvider(
+//   process.env.PROVIDER_URL
+// );
+const provider = new JsonRpcProvider("http://127.0.0.1:7545");
 const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider)
 const contract = new ethers.Contract(process.env.CONTRACT_ADDRESS, abi, signer);
 
